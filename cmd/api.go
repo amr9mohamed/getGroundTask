@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"database/sql"
 	"fmt"
+	"github.com/getground/tech-tasks/backend/boot"
+	"github.com/getground/tech-tasks/backend/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"net/http"
@@ -22,12 +23,12 @@ func API() *cobra.Command {
 }
 
 func runAPI() {
-	// init mysql.
-	db, err := sql.Open("mysql", "user:password@/getground")
+	cfg, err := config.NewAPI()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-	defer db.Close()
+	engine := boot.API(cfg)
+	log.Println(engine.RemoteIPHeaders)
 
 	// ping
 	http.HandleFunc("/ping", handlerPing)
