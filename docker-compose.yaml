@@ -2,16 +2,22 @@ version: '3.7'
 
 services:
   app:
+    container_name: gg_backend
     build:
       context: . 
       dockerfile: docker/deploy/Dockerfile
+    entrypoint: /bin/bash docker/deploy/entrypoint.sh
     restart: unless-stopped
     depends_on:
       - mysql
+    volumes:
+      - .:/app
     ports:
       - 3000:3000
+      - 2345:2345
 
   mysql:
+    container_name: gg_mysql
     image: mysql:5.7
     restart: unless-stopped
     environment:

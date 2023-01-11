@@ -1,15 +1,20 @@
-FROM golang:1.16-alpine
+FROM golang:1.18.5-buster AS builder
 
-WORKDIR /app
+ENV GO111MODULE on
+ENV APP_PATH=/app
 
-COPY go.mod go.sum ./
+RUN apt-get update && apt-get install -y git
+RUN go install github.com/cespare/reflex@latest
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+
+RUN cp /go/bin/reflex /usr/bin/reflex
+RUN cp /go/bin/dlv /usr/bin/dlv
+
+WORKDIR $APP_PATH
+
+#COPY go.mod .
+#COPY go.sum .
+COPY . .
 
 RUN go mod download
 
-COPY . .
-
-RUN go build -o bin/app cmd/app/main.go
-
-EXPOSE 3000
-
-CMD ["./bin/app"]
