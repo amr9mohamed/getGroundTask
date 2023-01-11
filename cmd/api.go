@@ -1,15 +1,27 @@
-package main
+package cmd
 
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 	"net/http"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func main() {
+func API() *cobra.Command {
+	return &cobra.Command{
+		Use:   "api",
+		Short: "start get ground party service in api mode",
+		Run: func(cmd *cobra.Command, args []string) {
+			log.Info("Starting get ground service api")
+			runAPI()
+		},
+	}
+}
+
+func runAPI() {
 	// init mysql.
 	db, err := sql.Open("mysql", "user:password@/getground")
 	if err != nil {

@@ -16,3 +16,6 @@
 
 # Delve binary
 dev
+
+# goland files
+*.idea
