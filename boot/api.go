@@ -4,6 +4,7 @@ import (
 	"github.com/getground/tech-tasks/backend/config"
 	"github.com/getground/tech-tasks/backend/pkg/database"
 	"github.com/getground/tech-tasks/backend/pkg/router"
+	"github.com/getground/tech-tasks/backend/pkg/tables"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -22,10 +23,21 @@ func API(cfg config.API) *gin.Engine {
 		gin.Recovery(),
 	)
 
+	// inti handlers
+	tablesHdl := tables.NewHandler()
+
 	// init repositories
+	tablesRepo := tables.NewRepository(dbConn)
+
 	// init services
+	tablesSrv := tables.NewService(tablesRepo)
+
 	// init controllers
+	tablesCtrl := tables.NewController(tablesHdl, tablesSrv)
+
 	// init routers
 	router.HealthCheckInitRoute(engine)
+	router.TablesInitRouter(engine, tablesCtrl)
+
 	return engine
 }
