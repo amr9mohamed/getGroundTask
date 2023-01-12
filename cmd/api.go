@@ -1,14 +1,16 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"github.com/getground/tech-tasks/backend/boot"
 	"github.com/getground/tech-tasks/backend/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"net/http"
-
-	_ "github.com/go-sql-driver/mysql"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func API() *cobra.Command {
@@ -27,14 +29,27 @@ func runAPI() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 	engine := boot.API(cfg)
-	log.Println(engine.RemoteIPHeaders)
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.HTTPPort),
+		Handler: engine,
+	}
 
-	// ping
-	http.HandleFunc("/ping", handlerPing)
-	http.ListenAndServe(":3000", nil)
-}
+	// Initializing the server in a goroutine so that
+	// it won't block the graceful shutdown handling below
+	go func() {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
 
-func handlerPing(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "pong\n")
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("shutting down the server")
+
+	if err := server.Shutdown(context.Background()); err != nil {
+		log.Fatalf("server is forced to shutdown")
+	}
 }
