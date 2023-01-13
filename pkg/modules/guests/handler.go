@@ -21,3 +21,21 @@ func (h Handler) Create(c *gin.Context) (req guests.CreateRequest, err error) {
 	err = c.ShouldBindJSON(&req)
 	return
 }
+
+func (h Handler) CheckIn(c *gin.Context) (req guests.CheckInRequest, err error) {
+	name := c.Param("name")
+	if name == "" {
+		err = errors.New("name is required")
+	}
+	req.Name = name
+	err = c.ShouldBindJSON(&req)
+	return
+}
+
+func (h Handler) CheckOut(c *gin.Context) (name string, err error) {
+	name = c.Param("name")
+	if name == "" {
+		err = errors.New("name is required")
+	}
+	return
+}

@@ -29,3 +29,12 @@ type GuestDTO struct {
 	Accompanying int64  `json:"accompanying_guests"`
 	TimeArrived  string `json:"time_arrived"`
 }
+
+type CheckInRequest struct {
+	Name         string
+	Accompanying int64 `json:"accompanying_guests"`
+}
+
+type CheckInResponse struct {
+	Name string `json:"name"`
+}

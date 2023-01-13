@@ -23,7 +23,11 @@ func (ctrl Controller) Create(c *gin.Context) {
 	req, err := ctrl.handler.Create(c)
 	if err != nil {
 		log.Error(err)
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
 		return
 	}
 
@@ -47,7 +51,7 @@ func (ctrl Controller) GetGuestList(c *gin.Context) {
 		log.Error(err)
 		c.JSON(
 			http.StatusInternalServerError, gin.H{
-				"error": err,
+				"error": err.Error(),
 			},
 		)
 		return
@@ -62,11 +66,63 @@ func (ctrl Controller) GetGuests(c *gin.Context) {
 		log.Error(err)
 		c.JSON(
 			http.StatusInternalServerError, gin.H{
-				"error": err,
+				"error": err.Error(),
 			},
 		)
 		return
 	}
 
 	c.JSON(http.StatusOK, res)
+}
+
+func (ctrl Controller) CheckIn(c *gin.Context) {
+	req, err := ctrl.handler.CheckIn(c)
+	if err != nil {
+		log.Error(err)
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	res, err := ctrl.service.CheckIn(req)
+	if err != nil {
+		log.Error(err)
+		c.JSON(
+			http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}
+
+func (ctrl Controller) CheckOut(c *gin.Context) {
+	name, err := ctrl.handler.CheckOut(c)
+	if err != nil {
+		log.Error(err)
+		c.JSON(
+			http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	err = ctrl.service.CheckOut(name)
+	if err != nil {
+		log.Error(err)
+		c.JSON(
+			http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusNoContent, http.NoBody)
 }

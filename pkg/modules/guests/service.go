@@ -53,3 +53,33 @@ func (s Service) GetGuests() (list guests.DTO, err error) {
 	list = mapGuestsToDTO(res)
 	return
 }
+
+func (s Service) CheckIn(req guests.CheckInRequest) (res guests.CheckInResponse, err error) {
+	g, err := s.repository.GetByName(req.Name)
+	if err != nil {
+		err = errors.New("guest not invited or already checked in")
+		return
+	}
+
+	t, err := s.tableSvc.GetByID(g.TableID)
+	if err != nil {
+		return
+	}
+
+	if (t.EmptySeats == 0) || (req.Accompanying-g.Accompanying-t.Capacity > 0) {
+		err = errors.New("extra accompanying than expected")
+		return
+	}
+
+	err = s.repository.CheckIn(req, g, t)
+	if err != nil {
+		return
+	}
+
+	res.Name = req.Name
+	return
+}
+
+func (s Service) CheckOut(name string) (err error) {
+	return s.repository.CheckOut(name)
+}
