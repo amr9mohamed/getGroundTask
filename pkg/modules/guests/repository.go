@@ -5,7 +5,6 @@ import (
 	"github.com/getground/tech-tasks/backend/definitions/guests"
 	"github.com/getground/tech-tasks/backend/definitions/tables"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Repository struct {
@@ -27,7 +26,6 @@ func (r Repository) Create(req guests.CreateRequest, tableCapacity int64) (err e
 					Name:         req.Name,
 					TableID:      req.Table,
 					Accompanying: req.Accompanying,
-					TimeArrived:  time.Now(),
 				},
 			).Error
 			if err != nil {
@@ -42,4 +40,13 @@ func (r Repository) Create(req guests.CreateRequest, tableCapacity int64) (err e
 			return nil
 		},
 	)
+}
+
+func (r Repository) GetGuestList(arrived bool) (list []guests.Guest, err error) {
+	if arrived {
+		err = r.db.Where("time_arrived IS NOT NULL").Find(&list).Error
+		return
+	}
+	err = r.db.Find(&guests.Guest{}).Scan(&list).Error
+	return
 }

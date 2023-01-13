@@ -9,3 +9,23 @@ type CreateRequest struct {
 type CreateResponse struct {
 	Name string `json:"name"`
 }
+
+type ListDTO struct {
+	Guests []GuestListDTO `json:"guests"`
+}
+
+type GuestListDTO struct {
+	Name         string `json:"name"`
+	Table        uint   `json:"table"`
+	Accompanying int64  `json:"accompanying_guests"`
+}
+
+type DTO struct {
+	Guests []GuestDTO `json:"guests"`
+}
+
+type GuestDTO struct {
+	Name         string `json:"name"`
+	Accompanying int64  `json:"accompanying_guests"`
+	TimeArrived  string `json:"time_arrived"`
+}

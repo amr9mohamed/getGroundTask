@@ -11,7 +11,7 @@ CREATE TABLE guests
     name         VARCHAR(255) UNICODE,
     table_id     INT,
     accompanying INT,
-    time_Arrived TIMESTAMP,
+    time_arrived TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (name),
     FOREIGN KEY (table_id) REFERENCES tables (id)
 );

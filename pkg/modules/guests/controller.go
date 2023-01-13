@@ -40,3 +40,33 @@ func (ctrl Controller) Create(c *gin.Context) {
 
 	c.JSON(http.StatusOK, res)
 }
+
+func (ctrl Controller) GetGuestList(c *gin.Context) {
+	res, err := ctrl.service.GetGuestList()
+	if err != nil {
+		log.Error(err)
+		c.JSON(
+			http.StatusInternalServerError, gin.H{
+				"error": err,
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}
+
+func (ctrl Controller) GetGuests(c *gin.Context) {
+	res, err := ctrl.service.GetGuests()
+	if err != nil {
+		log.Error(err)
+		c.JSON(
+			http.StatusInternalServerError, gin.H{
+				"error": err,
+			},
+		)
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}

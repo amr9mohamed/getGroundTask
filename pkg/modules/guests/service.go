@@ -35,3 +35,21 @@ func (s Service) Create(req guests.CreateRequest) (res guests.CreateResponse, er
 	res.Name = req.Name
 	return
 }
+
+func (s Service) GetGuestList() (list guests.ListDTO, err error) {
+	res, err := s.repository.GetGuestList(false)
+	if err != nil {
+		return
+	}
+	list = mapGuestsListToDTO(res)
+	return
+}
+
+func (s Service) GetGuests() (list guests.DTO, err error) {
+	res, err := s.repository.GetGuestList(true)
+	if err != nil {
+		return
+	}
+	list = mapGuestsToDTO(res)
+	return
+}

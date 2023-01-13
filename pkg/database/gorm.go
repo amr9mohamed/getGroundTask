@@ -11,7 +11,10 @@ import (
 )
 
 func New(cfg config.Database) (gormDB *gorm.DB, err error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name)
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", cfg.User, cfg.Password, cfg.Host, cfg.Port,
+		cfg.Name,
+	)
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		log.Fatal(err)
@@ -19,7 +22,7 @@ func New(cfg config.Database) (gormDB *gorm.DB, err error) {
 	gormDB, err = gorm.Open(
 		mysql.New(mysql.Config{Conn: db}),
 		&gorm.Config{
-			Logger:                 logger.Default.LogMode(logger.Info),
+			Logger: logger.Default.LogMode(logger.Info),
 			SkipDefaultTransaction: true,
 		},
 	)
