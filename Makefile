@@ -10,3 +10,7 @@ docker-down: ## Stop docker containers and clear artefacts.
 .PHONY: bundle
 bundle: ## bundles the submission for... submission
 	git bundle create guestlist.bundle --all
+
+.PHONY: linter
+linter:
+	golangci-lint run

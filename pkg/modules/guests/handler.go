@@ -26,6 +26,7 @@ func (h Handler) CheckIn(c *gin.Context) (req guests.CheckInRequest, err error) 
 	name := c.Param("name")
 	if name == "" {
 		err = errors.New("name is required")
+		return
 	}
 	req.Name = name
 	err = c.ShouldBindJSON(&req)

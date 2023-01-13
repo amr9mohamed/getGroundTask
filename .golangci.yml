@@ -1,0 +1,38 @@
+# all available settings of specific linters
+linters-settings:
+  gocritic:
+    enabled-tags:
+      - performance
+      - diagnostic
+      - style
+      - experimental
+      - opinionated
+    disabled-checks:
+      - hugeParam
+      - rangeValCopy
+      - unnamedResult
+  gofmt:
+    simplify: true
+  errcheck:
+    check-type-assertions: false
+    check-blank: false
+# options for analysis running
+run:
+  tests: true
+linters:
+  disable-all: true
+  enable:
+    - deadcode
+    - errcheck
+    - gocritic
+    - gofmt
+    - gosimple
+    - misspell
+    - prealloc
+    - revive
+    - staticcheck
+    - stylecheck
+    - unconvert
+    - unparam
+    - varcheck
+    - govet
