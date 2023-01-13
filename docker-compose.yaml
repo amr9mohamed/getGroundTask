@@ -9,7 +9,8 @@ services:
     entrypoint: /bin/bash docker/deploy/entrypoint.sh
     restart: unless-stopped
     depends_on:
-      - mysql
+       mysql:
+          condition: service_healthy
     volumes:
       - .:/app
     ports:
@@ -25,6 +26,10 @@ services:
       MYSQL_DATABASE: database
       MYSQL_USER: user
       MYSQL_PASSWORD: password
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 2s
+      retries: 10
     ports:
       - 3306:3306
     volumes:
