@@ -3,8 +3,8 @@ package boot
 import (
 	"github.com/getground/tech-tasks/backend/config"
 	"github.com/getground/tech-tasks/backend/pkg/database"
+	tables2 "github.com/getground/tech-tasks/backend/pkg/modules/tables"
 	"github.com/getground/tech-tasks/backend/pkg/router"
-	"github.com/getground/tech-tasks/backend/pkg/tables"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -24,16 +24,16 @@ func API(cfg config.API) *gin.Engine {
 	)
 
 	// inti handlers
-	tablesHdl := tables.NewHandler()
+	tablesHdl := tables2.NewHandler()
 
 	// init repositories
-	tablesRepo := tables.NewRepository(dbConn)
+	tablesRepo := tables2.NewRepository(dbConn)
 
 	// init services
-	tablesSrv := tables.NewService(tablesRepo)
+	tablesSrv := tables2.NewService(tablesRepo)
 
 	// init controllers
-	tablesCtrl := tables.NewController(tablesHdl, tablesSrv)
+	tablesCtrl := tables2.NewController(tablesHdl, tablesSrv)
 
 	// init routers
 	router.HealthCheckInitRoute(engine)

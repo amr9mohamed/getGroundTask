@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/getground/tech-tasks/backend/pkg/tables"
+	"github.com/getground/tech-tasks/backend/pkg/modules/tables"
 	"github.com/gin-gonic/gin"
 )
 
