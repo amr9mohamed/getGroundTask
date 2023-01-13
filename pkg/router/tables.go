@@ -7,4 +7,5 @@ import (
 
 func TablesInitRouter(router *gin.Engine, ctrl tables.Controller) {
 	router.POST("/tables", ctrl.Create)
+	router.GET("/seats_empty", ctrl.CountEmptySeats)
 }

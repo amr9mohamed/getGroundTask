@@ -26,15 +26,22 @@ func (ctrl Controller) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 		return
 	}
+
 	res, err := ctrl.service.Create(req)
 	if err != nil {
 		log.Error(err)
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
 	c.JSON(http.StatusOK, res)
 }
 
 func (ctrl Controller) CountEmptySeats(c *gin.Context) {
-	//	call service
+	seatsEmpty := ctrl.service.CountEmptySeats()
+	c.JSON(
+		http.StatusOK, gin.H{
+			"seats_empty": seatsEmpty,
+		},
+	)
 }

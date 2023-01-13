@@ -21,3 +21,7 @@ func (s service) Create(req tables.CreateRequest) (res tables.CreateResponse, er
 	}
 	return
 }
+
+func (s service) CountEmptySeats() (count int) {
+	return s.repository.CountEmptySeats()
+}

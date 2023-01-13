@@ -21,3 +21,8 @@ func (r repository) Create(req tables.CreateRequest) (t tables.Table, err error)
 	err = r.db.Create(&t).Error
 	return
 }
+
+func (r repository) CountEmptySeats() (count int) {
+	r.db.Model(&tables.Table{}).Select("SUM(empty_seats)").Scan(&count)
+	return
+}
