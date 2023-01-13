@@ -19,7 +19,8 @@ func New(cfg config.Database) (gormDB *gorm.DB, err error) {
 	gormDB, err = gorm.Open(
 		mysql.New(mysql.Config{Conn: db}),
 		&gorm.Config{
-			Logger: logger.Default.LogMode(logger.Info),
+			Logger:                 logger.Default.LogMode(logger.Info),
+			SkipDefaultTransaction: true,
 		},
 	)
 	return gormDB.Session(&gorm.Session{}), err
