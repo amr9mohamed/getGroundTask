@@ -9,5 +9,5 @@ type Guest struct {
 	TableID      uint
 	Accompanying int64
 	TimeArrived  *time.Time
-	CheckedOut   bool
+	CheckedOut   int
 }
