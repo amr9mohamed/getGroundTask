@@ -53,7 +53,7 @@ func (r Repository) GetGuestList(arrived bool) (list []guests.Guest, err error) 
 		err = r.db.Where("time_arrived IS NOT NULL").Find(&list).Error
 		return
 	}
-	err = r.db.Find(&guests.Guest{}).Scan(&list).Error
+	err = r.db.Find(&list).Error // get all arrived or not
 	return
 }
 
@@ -89,18 +89,18 @@ func (r Repository) CheckIn(req guests.CheckInRequest, g guests.Guest, t tables.
 func (r Repository) CheckOut(name string) (err error) {
 	// check if guest exists and already checked in
 	g := guests.Guest{}
-	err = r.db.Where("name = ?", name).Where("time_Arrived IS NOT NULL").First(&g).Error
+	err = r.db.Where("name = ?", name).Where("time_arrived IS NOT NULL").First(&g).Error
 	if err != nil {
 		return err
 	}
 
 	// update empty seats
-	t := tables.Table{}
-	err = r.db.First(&tables.Table{ID: g.TableID}).Scan(&t).Error
+	t := tables.Table{ID: g.TableID}
+	err = r.db.First(&t).Error
 	if err != nil {
 		return err
 	}
-	err = r.db.Where(&tables.Table{ID: t.ID}).Updates(tables.Table{Capacity: t.Capacity + g.Accompanying + 1}).Error
+	err = r.db.Where(&tables.Table{ID: t.ID}).Updates(tables.Table{EmptySeats: t.EmptySeats + g.Accompanying + 1}).Error
 
 	return
 }
