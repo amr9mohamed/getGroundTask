@@ -483,7 +483,7 @@ func TestController_CheckOut(t *testing.T) {
 			//	request
 			r.DELETE("/guests/:name", ctrl.CheckOut)
 
-			req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("/guests/%s", name), nil)
+			req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("/guests/%s", name), http.NoBody)
 			if err != nil {
 				t.Errorf("Error requesting test controller: %v\n", err)
 			}
