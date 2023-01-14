@@ -12,6 +12,7 @@ CREATE TABLE guests
     table_id     INT,
     accompanying INT,
     time_arrived TIMESTAMP NULL DEFAULT NULL,
+    checked_out bool default false,
     PRIMARY KEY (name),
     FOREIGN KEY (table_id) REFERENCES tables (id)
 );
