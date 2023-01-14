@@ -259,7 +259,7 @@ func TestRepository_CheckOut(t *testing.T) {
 			name := "test"
 
 			//	mocks
-			q := "SELECT * FROM `guests` WHERE name = ? AND time_arrived IS NOT NULL ORDER BY `guests`.`name` LIMIT 1"
+			q := "SELECT * FROM `guests` WHERE name = ? AND checked_out = 0 AND time_arrived IS NOT NULL ORDER BY `guests`.`name` LIMIT 1"
 			m.sqlMock.
 				ExpectQuery(regexp.QuoteMeta(q)).
 				WithArgs(name).
@@ -289,7 +289,7 @@ func TestRepository_CheckOut(t *testing.T) {
 			}
 
 			//	mocks
-			guestQuery := "SELECT * FROM `guests` WHERE name = ? AND time_arrived IS NOT NULL ORDER BY `guests`.`name` LIMIT 1"
+			guestQuery := "SELECT * FROM `guests` WHERE name = ? AND checked_out = 0 AND time_arrived IS NOT NULL ORDER BY `guests`.`name` LIMIT 1"
 			tableQuery := "SELECT * FROM `tables` WHERE `tables`.`id` = ? ORDER BY `tables`.`id` LIMIT 1"
 			m.sqlMock.
 				ExpectQuery(regexp.QuoteMeta(guestQuery)).
@@ -306,6 +306,65 @@ func TestRepository_CheckOut(t *testing.T) {
 				ExpectQuery(regexp.QuoteMeta(tableQuery)).
 				WithArgs(g.TableID).
 				WillReturnError(errors.New("table not found"))
+
+			//	method call
+			err := repo.CheckOut(name)
+
+			//	assert
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"update guest fail", func(t *testing.T) {
+			// setup
+			repo, m := setupIntegrationRepo(t)
+
+			// test data
+			name := "test"
+			timeArrived := time.Now()
+			g := guestsDef.Guest{
+				Name:         "test",
+				TableID:      1,
+				Accompanying: 10,
+				TimeArrived:  &timeArrived,
+			}
+			tbl := tablesDef.Table{
+				ID:         1,
+				Capacity:   10,
+				EmptySeats: 10,
+			}
+
+			//	mocks
+			guestQuery := "SELECT * FROM `guests` WHERE name = ? AND checked_out = 0 AND time_arrived IS NOT NULL ORDER BY `guests`.`name` LIMIT 1"
+			tableQuery := "SELECT * FROM `tables` WHERE `tables`.`id` = ? ORDER BY `tables`.`id` LIMIT 1"
+			updateGuest := "UPDATE `guests` SET `checked_out`=? WHERE `guests`.`name` = ?"
+			m.sqlMock.
+				ExpectQuery(regexp.QuoteMeta(guestQuery)).
+				WithArgs(name).
+				WillReturnRows(
+					sqlmock.NewRows(
+						[]string{
+							"name", "table_id", "accompanying",
+							"time_arrived",
+						},
+					).AddRow(g.Name, g.TableID, g.Accompanying, g.TimeArrived),
+				)
+			m.sqlMock.
+				ExpectQuery(regexp.QuoteMeta(tableQuery)).
+				WithArgs(g.TableID).
+				WillReturnRows(
+					sqlmock.NewRows([]string{"id", "capacity", "empty_seats"}).AddRow(
+						tbl.ID,
+						tbl.Capacity, tbl.EmptySeats,
+					),
+				)
+			m.sqlMock.ExpectBegin()
+			m.sqlMock.ExpectExec(regexp.QuoteMeta(updateGuest)).WithArgs(
+				1,
+				name,
+			).WillReturnError(errors.New("error updating guest"))
+			m.sqlMock.ExpectRollback()
 
 			//	method call
 			err := repo.CheckOut(name)
@@ -336,8 +395,9 @@ func TestRepository_CheckOut(t *testing.T) {
 			}
 
 			//	mocks
-			guestQuery := "SELECT * FROM `guests` WHERE name = ? AND time_arrived IS NOT NULL ORDER BY `guests`.`name` LIMIT 1"
+			guestQuery := "SELECT * FROM `guests` WHERE name = ? AND checked_out = 0 AND time_arrived IS NOT NULL ORDER BY `guests`.`name` LIMIT 1"
 			tableQuery := "SELECT * FROM `tables` WHERE `tables`.`id` = ? ORDER BY `tables`.`id` LIMIT 1"
+			updateGuest := "UPDATE `guests` SET `checked_out`=? WHERE `guests`.`name` = ?"
 			updateTable := " UPDATE `tables` SET `empty_seats`=? WHERE `tables`.`id` = ?"
 			m.sqlMock.
 				ExpectQuery(regexp.QuoteMeta(guestQuery)).
@@ -360,6 +420,10 @@ func TestRepository_CheckOut(t *testing.T) {
 					),
 				)
 			m.sqlMock.ExpectBegin()
+			m.sqlMock.ExpectExec(regexp.QuoteMeta(updateGuest)).WithArgs(
+				1,
+				name,
+			).WillReturnResult(sqlmock.NewResult(1, 1))
 			m.sqlMock.ExpectExec(regexp.QuoteMeta(updateTable)).WithArgs(
 				tbl.EmptySeats+g.Accompanying+1,
 				tbl.ID,
@@ -395,8 +459,9 @@ func TestRepository_CheckOut(t *testing.T) {
 			}
 
 			//	mocks
-			guestQuery := "SELECT * FROM `guests` WHERE name = ? AND time_arrived IS NOT NULL ORDER BY `guests`.`name` LIMIT 1"
+			guestQuery := "SELECT * FROM `guests` WHERE name = ? AND checked_out = 0 AND time_arrived IS NOT NULL ORDER BY `guests`.`name` LIMIT 1"
 			tableQuery := "SELECT * FROM `tables` WHERE `tables`.`id` = ? ORDER BY `tables`.`id` LIMIT 1"
+			updateGuest := "UPDATE `guests` SET `checked_out`=? WHERE `guests`.`name` = ?"
 			updateTable := " UPDATE `tables` SET `empty_seats`=? WHERE `tables`.`id` = ?"
 			m.sqlMock.
 				ExpectQuery(regexp.QuoteMeta(guestQuery)).
@@ -419,6 +484,14 @@ func TestRepository_CheckOut(t *testing.T) {
 					),
 				)
 			m.sqlMock.ExpectBegin()
+			m.sqlMock.ExpectExec(regexp.QuoteMeta(updateGuest)).WithArgs(
+				1,
+				name,
+			).WillReturnResult(sqlmock.NewResult(1, 1))
+			m.sqlMock.ExpectExec(regexp.QuoteMeta(updateGuest)).WithArgs(
+				1,
+				name,
+			).WillReturnResult(sqlmock.NewResult(1, 1))
 			m.sqlMock.ExpectExec(regexp.QuoteMeta(updateTable)).WithArgs(
 				tbl.EmptySeats+g.Accompanying+1,
 				tbl.ID,

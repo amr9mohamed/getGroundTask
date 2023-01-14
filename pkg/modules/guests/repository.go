@@ -91,7 +91,7 @@ func (r Repository) CheckOut(name string) (err error) {
 	g := guests.Guest{}
 	err = r.db.
 		Where("name = ?", name).
-		Where("checked_out IS NULL").
+		Where("checked_out = 0").
 		Where("time_arrived IS NOT NULL").
 		First(&g).Error
 	if err != nil {
