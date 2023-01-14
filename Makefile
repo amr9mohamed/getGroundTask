@@ -14,3 +14,7 @@ bundle: ## bundles the submission for... submission
 .PHONY: linter
 linter:
 	golangci-lint run
+
+.PHONY: mocks
+mocks:
+	mockery --all --recursive --keeptree

@@ -1,7 +1,7 @@
 package tables
 
 type CreateRequest struct {
-	Capacity int64 `json:"capacity" binding:"required"`
+	Capacity int64 `json:"capacity" binding:"required" gt:"0"`
 }
 
 type CreateResponse struct {
