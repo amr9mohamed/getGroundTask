@@ -338,7 +338,7 @@ func TestRepository_CheckIn(t *testing.T) {
 			//	setup
 			repo, m := setupIntegrationRepo(t)
 
-			//test data
+			// test data
 			checkInReq := guestsDef.CheckInRequest{
 				Name:         "test",
 				Accompanying: 10,
@@ -378,7 +378,7 @@ func TestRepository_CheckIn(t *testing.T) {
 			//	setup
 			repo, m := setupIntegrationRepo(t)
 
-			//test data
+			// test data
 			checkInReq := guestsDef.CheckInRequest{
 				Name:         "test",
 				Accompanying: 10,
@@ -423,7 +423,7 @@ func TestRepository_CheckIn(t *testing.T) {
 			//	setup
 			repo, m := setupIntegrationRepo(t)
 
-			//test data
+			// test data
 			checkInReq := guestsDef.CheckInRequest{
 				Name:         "test",
 				Accompanying: 10,
