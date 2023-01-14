@@ -41,19 +41,105 @@ func setupIntegrationRepo(t *testing.T) (guestsDef.Repository, repoMocks) {
 func TestRepository_Create(t *testing.T) {
 	t.Run(
 		"error create guest", func(t *testing.T) {
+			//	setup
+			repo, m := setupIntegrationRepo(t)
 
+			// test data
+			createReq := guestsDef.CreateRequest{
+				Name:         "test",
+				Table:        1,
+				Accompanying: 1,
+			}
+			capacity := int64(5)
+
+			//	mocks
+			createGuest := "INSERT INTO `guests` (`name`,`table_id`,`accompanying`,`time_arrived`,`checked_out`) VALUES (?,?,?,?,?)"
+			m.sqlMock.ExpectBegin()
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(createGuest)).
+				WithArgs(createReq.Name, createReq.Table, createReq.Accompanying, nil, 0).
+				WillReturnError(
+					errors.New(
+						"error adding guest",
+					),
+				)
+			m.sqlMock.ExpectRollback()
+
+			//	method call
+			err := repo.Create(createReq, capacity)
+
+			//	assert
+			assert.Error(t, err)
 		},
 	)
 
 	t.Run(
 		"error update table", func(t *testing.T) {
+			//	setup
+			repo, m := setupIntegrationRepo(t)
 
+			// test data
+			createReq := guestsDef.CreateRequest{
+				Name:         "test",
+				Table:        1,
+				Accompanying: 1,
+			}
+			capacity := int64(5)
+
+			//	mocks
+			createGuest := "INSERT INTO `guests` (`name`,`table_id`,`accompanying`,`time_arrived`,`checked_out`) VALUES (?,?,?,?,?)"
+			updateTable := "UPDATE `tables` SET `capacity`=? WHERE `tables`.`id` = ?"
+			m.sqlMock.ExpectBegin()
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(createGuest)).
+				WithArgs(createReq.Name, createReq.Table, createReq.Accompanying, nil, 0).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(updateTable)).
+				WithArgs(capacity, createReq.Table).
+				WillReturnError(errors.New("error update table"))
+			m.sqlMock.ExpectRollback()
+
+			//	method call
+			err := repo.Create(createReq, capacity)
+
+			//	assert
+			assert.Error(t, err)
 		},
 	)
 
 	t.Run(
 		"success", func(t *testing.T) {
+			//	setup
+			repo, m := setupIntegrationRepo(t)
 
+			// test data
+			createReq := guestsDef.CreateRequest{
+				Name:         "test",
+				Table:        1,
+				Accompanying: 1,
+			}
+			capacity := int64(5)
+
+			//	mocks
+			createGuest := "INSERT INTO `guests` (`name`,`table_id`,`accompanying`,`time_arrived`,`checked_out`) VALUES (?,?,?,?,?)"
+			updateTable := "UPDATE `tables` SET `capacity`=? WHERE `tables`.`id` = ?"
+			m.sqlMock.ExpectBegin()
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(createGuest)).
+				WithArgs(createReq.Name, createReq.Table, createReq.Accompanying, nil, 0).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(updateTable)).
+				WithArgs(capacity, createReq.Table).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			m.sqlMock.ExpectCommit()
+
+			//	method call
+			err := repo.Create(createReq, capacity)
+
+			//	assert
+			assert.NoError(t, err)
 		},
 	)
 }
@@ -247,6 +333,135 @@ func TestRepository_GetGuestList(t *testing.T) {
 }
 
 func TestRepository_CheckIn(t *testing.T) {
+	t.Run(
+		"error uodate guest", func(t *testing.T) {
+			//	setup
+			repo, m := setupIntegrationRepo(t)
+
+			//test data
+			checkInReq := guestsDef.CheckInRequest{
+				Name:         "test",
+				Accompanying: 10,
+			}
+			g := guestsDef.Guest{
+				Name:         "test",
+				TableID:      1,
+				Accompanying: 10,
+				TimeArrived:  nil,
+				CheckedOut:   0,
+			}
+			tbl := tablesDef.Table{
+				ID:         1,
+				Capacity:   10,
+				EmptySeats: 10,
+			}
+
+			//	mocks
+			updateGuest := "UPDATE `guests` SET `accompanying`=?,`time_arrived`=? WHERE `guests`.`name` = ?"
+			m.sqlMock.ExpectBegin()
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(updateGuest)).
+				WithArgs(checkInReq.Accompanying, sqlmock.AnyArg(), checkInReq.Name).
+				WillReturnError(errors.New("error update guest"))
+			m.sqlMock.ExpectRollback()
+
+			//	method call
+			err := repo.CheckIn(checkInReq, g, tbl)
+
+			//	assert
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"error update table", func(t *testing.T) {
+			//	setup
+			repo, m := setupIntegrationRepo(t)
+
+			//test data
+			checkInReq := guestsDef.CheckInRequest{
+				Name:         "test",
+				Accompanying: 10,
+			}
+			g := guestsDef.Guest{
+				Name:         "test",
+				TableID:      1,
+				Accompanying: 10,
+				TimeArrived:  nil,
+				CheckedOut:   0,
+			}
+			tbl := tablesDef.Table{
+				ID:         1,
+				Capacity:   10,
+				EmptySeats: 10,
+			}
+
+			//	mocks
+			updateGuest := "UPDATE `guests` SET `accompanying`=?,`time_arrived`=? WHERE `guests`.`name` = ?"
+			updateTable := "UPDATE `tables` SET `capacity`=?,`empty_seats`=? WHERE `tables`.`id` = ?"
+			m.sqlMock.ExpectBegin()
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(updateGuest)).
+				WithArgs(checkInReq.Accompanying, sqlmock.AnyArg(), checkInReq.Name).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(updateTable)).
+				WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+				WillReturnError(errors.New("error updating table"))
+			m.sqlMock.ExpectRollback()
+
+			//	method call
+			err := repo.CheckIn(checkInReq, g, tbl)
+
+			//	assert
+			assert.Error(t, err)
+		},
+	)
+
+	t.Run(
+		"success", func(t *testing.T) {
+			//	setup
+			repo, m := setupIntegrationRepo(t)
+
+			//test data
+			checkInReq := guestsDef.CheckInRequest{
+				Name:         "test",
+				Accompanying: 10,
+			}
+			g := guestsDef.Guest{
+				Name:         "test",
+				TableID:      1,
+				Accompanying: 10,
+				TimeArrived:  nil,
+				CheckedOut:   0,
+			}
+			tbl := tablesDef.Table{
+				ID:         1,
+				Capacity:   10,
+				EmptySeats: 10,
+			}
+
+			//	mocks
+			updateGuest := "UPDATE `guests` SET `accompanying`=?,`time_arrived`=? WHERE `guests`.`name` = ?"
+			updateTable := "UPDATE `tables` SET `capacity`=?,`empty_seats`=? WHERE `tables`.`id` = ?"
+			m.sqlMock.ExpectBegin()
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(updateGuest)).
+				WithArgs(checkInReq.Accompanying, sqlmock.AnyArg(), checkInReq.Name).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			m.sqlMock.
+				ExpectExec(regexp.QuoteMeta(updateTable)).
+				WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg()).
+				WillReturnResult(sqlmock.NewResult(1, 1))
+			m.sqlMock.ExpectCommit()
+
+			//	method call
+			err := repo.CheckIn(checkInReq, g, tbl)
+
+			//	assert
+			assert.NoError(t, err)
+		},
+	)
 }
 
 func TestRepository_CheckOut(t *testing.T) {

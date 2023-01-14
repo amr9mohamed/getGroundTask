@@ -22,7 +22,7 @@ func (r Repository) Create(req guests.CreateRequest, tableCapacity int64) (err e
 	return r.db.Transaction(
 		func(tx *gorm.DB) error {
 			// create guest
-			err := r.db.Model(&guests.Guest{}).Create(
+			err := tx.Model(&guests.Guest{}).Create(
 				guests.Guest{
 					Name:         req.Name,
 					TableID:      req.Table,
@@ -34,7 +34,7 @@ func (r Repository) Create(req guests.CreateRequest, tableCapacity int64) (err e
 			}
 
 			// update table capacity if guest created
-			err = r.db.Where(&tables.Table{ID: req.Table}).Updates(tables.Table{Capacity: tableCapacity}).Error
+			err = tx.Where(&tables.Table{ID: req.Table}).Updates(tables.Table{Capacity: tableCapacity}).Error
 			if err != nil {
 				return errors.New("error reserving table seats")
 			}
