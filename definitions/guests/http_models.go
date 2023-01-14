@@ -3,7 +3,7 @@ package guests
 type CreateRequest struct {
 	Name         string `json:"name" binding:"required"`
 	Table        uint   `json:"table" binding:"required"`
-	Accompanying int64  `json:"accompanying_guests" binding:"required"`
+	Accompanying int64  `json:"accompanying_guests" binding:"required" gt:"0"`
 }
 
 type CreateResponse struct {
@@ -31,8 +31,8 @@ type GuestDTO struct {
 }
 
 type CheckInRequest struct {
-	Name         string
-	Accompanying int64 `json:"accompanying_guests"`
+	Name         string `json:"name" binding:"required"`
+	Accompanying int64  `json:"accompanying_guests" binding:"required" gt:"0"`
 }
 
 type CheckInResponse struct {
