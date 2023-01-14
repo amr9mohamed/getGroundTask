@@ -66,7 +66,7 @@ func (s Service) CheckIn(req guests.CheckInRequest) (res guests.CheckInResponse,
 		return
 	}
 
-	if (t.EmptySeats == 0) || (req.Accompanying-g.Accompanying-t.Capacity > 0) {
+	if req.Accompanying-g.Accompanying-t.Capacity > 0 {
 		err = errors.New("extra accompanying than expected")
 		return
 	}
