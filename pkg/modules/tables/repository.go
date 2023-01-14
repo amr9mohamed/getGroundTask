@@ -13,13 +13,16 @@ func NewRepository(db *gorm.DB) repository {
 	return repository{db: db}
 }
 
-func (r repository) Create(req tables.CreateRequest) (t tables.Table, err error) {
-	t = tables.Table{
+func (r repository) Create(req tables.CreateRequest) (tables.Table, error) {
+	t := tables.Table{
 		Capacity:   req.Capacity,
 		EmptySeats: req.Capacity,
 	}
-	err = r.db.Create(&t).Error
-	return
+	err := r.db.Create(&t).Error
+	if err != nil {
+		return tables.Table{}, err
+	}
+	return t, nil
 }
 
 func (r repository) GetByID(id uint) (t tables.Table, err error) {

@@ -20,11 +20,28 @@ func New(cfg config.Database) (gormDB *gorm.DB, err error) {
 		log.Fatal(err)
 	}
 	gormDB, err = gorm.Open(
-		mysql.New(mysql.Config{Conn: db}),
+		mysql.New(mysql.Config{Conn: db, SkipInitializeWithVersion: true}),
 		&gorm.Config{
 			Logger:                 logger.Default.LogMode(logger.Info),
 			SkipDefaultTransaction: true,
 		},
 	)
 	return gormDB.Session(&gorm.Session{}), err
+}
+
+func getCfg() gorm.Config {
+	return gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	}
+}
+
+func NewDatabaseForTests(conn gorm.Dialector) (*gorm.DB, error) {
+	gCfg := getCfg()
+	connection, err := gorm.Open(conn, &gCfg)
+	if err != nil {
+		return nil, err
+	}
+	connection = connection.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8")
+
+	return connection.Session(&gorm.Session{}), nil
 }
