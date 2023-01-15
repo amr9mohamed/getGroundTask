@@ -33,6 +33,107 @@ This is the schema that I have used to model the task
 
 ![My Image](schema.png)
 
+## API
+### Add table
+
+```
+POST /tables
+body: 
+{
+    "capacity": 10
+}
+response: 
+{
+    "id": 2,
+    "capacity": 10
+}
+```
+
+### Add a guest to the guest-list
+
+If there is insufficient space at the specified table, then an error should be thrown.
+
+```
+POST /guest_list/name
+body: 
+{
+    "table": int,
+    "accompanying_guests": int
+}
+response: 
+{
+    "name": "string"
+}
+```
+
+### Get the guest list
+
+```
+GET /guest_list
+response: 
+{
+    "guests": [
+        {
+            "name": "string",
+            "table": int,
+            "accompanying_guests": int
+        }, ...
+    ]
+}
+```
+
+### Guest Arrives
+
+A guest may arrive with an entourage that is not the size indicated at the guest list.
+If the table is expected to have space for the extras, allow them to come. Otherwise, this method should throw an error.
+
+```
+PUT /guests/name
+body:
+{
+    "accompanying_guests": int
+}
+response:
+{
+    "name": "string"
+}
+```
+
+### Guest Leaves
+
+When a guest leaves, all their accompanying guests leave as well.
+
+```
+DELETE /guests/name
+response code: 204
+```
+
+### Get arrived guests
+
+```
+GET /guests
+response: 
+{
+    "guests": [
+        {
+            "name": "string",
+            "accompanying_guests": int,
+            "time_arrived": "string"
+        }
+    ]
+}
+```
+
+### Count number of empty seats
+
+```
+GET /seats_empty
+response:
+{
+    "seats_empty": int
+}
+```
+
 ## Entrypoint
 The entrypoint for the project is the main.go file in the root folder.
 The main.go define a cobra command that define the modes that the app can run in, for now it is just and API mode.
@@ -44,4 +145,9 @@ The APi boot initialise all the API dependencies (just database in our case) and
 ## Testing
 All the modules files are test with coverage 100% testing most if not all the scenarios.
 
-I have used mockery to help in dependency injection and sql-mock to test sql queries 
+I have used mockery to help in dependency injection and sql-mock to test sql queries.
+
+## Things to improve
+- There is always room for improvements, as already mentioned before it is better to have another identifier for the guest rather than the name, email or an id would be much better and applicable to real life cases.
+
+- It is better to use for openApi for example to declare the APIs this would have many benefits, like being able to generate the requests from that declaration files and generating swag files.
